@@ -102,65 +102,53 @@ public class Main {
     public static void test1(String w, String t, int m){
 
         long startTime1 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){
-            Sim1.encode(w);
-        }
+        for(int i = 0; i < m; i++){ Sim1.encode(w); }
         long endTime1 = System.currentTimeMillis();
 
         long startTime2 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){
-            Sim1.genKey(t);
-        }
+        for(int i = 0; i < m; i++){ Sim1.genKey(t); }
         long endTime2 = System.currentTimeMillis();
 
 
         boolean flag = false;
         long startTime3 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){
-            flag = Sim1.pairing();
-        }
+        for(int i = 0; i < m; i++){ flag = Sim1.pairing(); }
         long endTime3 = System.currentTimeMillis();
 
 
-        System.out.println("算法Ⅰ对 " + w + " 和 " + t + " 的测试\n==========================");
-        System.out.println("验证结果: " + flag);
-        System.out.println("加密 " + w + " 时长: " + (double)(endTime1 - startTime1)/m + "ms");
-
-        System.out.println("计算 " + t + " 陷门时长: " + (double)(endTime2 - startTime2)/m + "ms");
-        System.out.println("匹配时长: " + (double)(endTime3 - startTime3)/m + "ms\n==========================\n\n");
+        printRes(1, flag, w, t, (double)(endTime1 - startTime1)/m, (double)(endTime2 - startTime2)/m, (double)(endTime3 - startTime3)/m);
     }
 
 
     public static void test2(String w, String t, int m){
 
         long startTime1 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){
-            Sim2.encode(w);
-        }
+        for(int i = 0; i < m; i++){ Sim2.encode(w); }
         long endTime1 = System.currentTimeMillis();
 
 
 
         long startTime2 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){
-            Sim2.genKey(t);
-        }
+        for(int i = 0; i < m; i++){ Sim2.genKey(t); }
         long endTime2 = System.currentTimeMillis();
 
 
         boolean flag = false;
         long startTime3 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){
-            flag = Sim2.pairing();
-        }
+        for(int i = 0; i < m; i++){ flag = Sim2.pairing(); }
         long endTime3 = System.currentTimeMillis();
+        printRes(2, flag, w, t, (double)(endTime1 - startTime1)/m, (double)(endTime2 - startTime2)/m, (double)(endTime3 - startTime3)/m);
 
-        System.out.println("算法Ⅱ对 " + w + " 和 " + t + " 的测试\n==========================");
+    }
+
+    static void printRes(int type, boolean flag, String w, String t, double t1, double t2, double t3){
+        System.out.println("算法 " + type + " 对 " + w + " 和 " + t + " 的测试");
+        System.out.println("==========================");
         System.out.println("验证结果: " + flag);
-        System.out.println("加密 " + w + " 时长: " + (double)(endTime1 - startTime1)/m + "ms");
-
-        System.out.println("计算 " + t + " 陷门时长: " + (double)(endTime2 - startTime2)/m + "ms");
-        System.out.println("匹配时长: " + (double)(endTime3 - startTime3)/m + "ms\n==========================\n\n");
+        System.out.println("加密 " + w + " 时长: " + t1 + "ms");
+        System.out.println("计算 " + t + " 陷门时长: " + t2 + "ms");
+        System.out.println("匹配时长: " + t3 + "ms");
+        System.out.println("==========================");
     }
 
 }
