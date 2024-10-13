@@ -1,7 +1,7 @@
 package com.northboat;
 
-import com.northboat.sim.Sim1;
-import com.northboat.sim.Sim2;
+import com.northboat.sim.SPWSE_1;
+import com.northboat.sim.SPWSE_2;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -93,8 +93,8 @@ public class Main {
         String w = "wouldwouldwouldwould"; // 关键词
         String t = "wouldwo**dwouldwould"; // 搜索字
 
-        Sim1.setup(bp, n, G1, G2, GT, Zr, g1, g2, v, S, T, r, R, m);
-        Sim2.setup(bp, n, G1, GT, Zr, g1, pkc, pka, a1, b1, b2, xt, v, r, xti, S, T, R, m, s);
+        SPWSE_1.setup(bp, n, G1, G2, GT, Zr, g1, g2, v, S, T, r, R, m);
+        SPWSE_2.setup(bp, n, G1, GT, Zr, g1, pkc, pka, a1, b1, b2, xt, v, r, xti, S, T, R, m, s);
         test1(w, t, k);
         test2(w, t, k);
     }
@@ -102,53 +102,65 @@ public class Main {
     public static void test1(String w, String t, int m){
 
         long startTime1 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){ Sim1.encode(w); }
+        for(int i = 0; i < m; i++){
+            SPWSE_1.encode(w);
+        }
         long endTime1 = System.currentTimeMillis();
 
         long startTime2 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){ Sim1.genKey(t); }
+        for(int i = 0; i < m; i++){
+            SPWSE_1.genKey(t);
+        }
         long endTime2 = System.currentTimeMillis();
 
 
         boolean flag = false;
         long startTime3 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){ flag = Sim1.pairing(); }
+        for(int i = 0; i < m; i++){
+            flag = SPWSE_1.pairing();
+        }
         long endTime3 = System.currentTimeMillis();
 
 
-        printRes(1, flag, w, t, (double)(endTime1 - startTime1)/m, (double)(endTime2 - startTime2)/m, (double)(endTime3 - startTime3)/m);
+        System.out.println("算法Ⅰ对 " + w + " 和 " + t + " 的测试\n==========================");
+        System.out.println("验证结果: " + flag);
+        System.out.println("加密 " + w + " 时长: " + (double)(endTime1 - startTime1)/m + "ms");
+
+        System.out.println("计算 " + t + " 陷门时长: " + (double)(endTime2 - startTime2)/m + "ms");
+        System.out.println("匹配时长: " + (double)(endTime3 - startTime3)/m + "ms\n==========================\n\n");
     }
 
 
     public static void test2(String w, String t, int m){
 
         long startTime1 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){ Sim2.encode(w); }
+        for(int i = 0; i < m; i++){
+            SPWSE_2.encode(w);
+        }
         long endTime1 = System.currentTimeMillis();
 
 
 
         long startTime2 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){ Sim2.genKey(t); }
+        for(int i = 0; i < m; i++){
+            SPWSE_2.genKey(t);
+        }
         long endTime2 = System.currentTimeMillis();
 
 
         boolean flag = false;
         long startTime3 = System.currentTimeMillis();
-        for(int i = 0; i < m; i++){ flag = Sim2.pairing(); }
+        for(int i = 0; i < m; i++){
+            flag = SPWSE_2.pairing();
+        }
         long endTime3 = System.currentTimeMillis();
-        printRes(2, flag, w, t, (double)(endTime1 - startTime1)/m, (double)(endTime2 - startTime2)/m, (double)(endTime3 - startTime3)/m);
 
-    }
-
-    static void printRes(int type, boolean flag, String w, String t, double t1, double t2, double t3){
-        System.out.println("算法 " + type + " 对 " + w + " 和 " + t + " 的测试");
-        System.out.println("==========================");
+        System.out.println("算法Ⅱ对 " + w + " 和 " + t + " 的测试\n==========================");
         System.out.println("验证结果: " + flag);
-        System.out.println("加密 " + w + " 时长: " + t1 + "ms");
-        System.out.println("计算 " + t + " 陷门时长: " + t2 + "ms");
-        System.out.println("匹配时长: " + t3 + "ms");
-        System.out.println("==========================");
+        System.out.println("加密 " + w + " 时长: " + (double)(endTime1 - startTime1)/m + "ms");
+
+        System.out.println("计算 " + t + " 陷门时长: " + (double)(endTime2 - startTime2)/m + "ms");
+        System.out.println("匹配时长: " + (double)(endTime3 - startTime3)/m + "ms\n==========================\n\n");
     }
 
 }

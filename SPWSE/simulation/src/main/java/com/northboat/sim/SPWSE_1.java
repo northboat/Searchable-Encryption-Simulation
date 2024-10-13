@@ -8,14 +8,14 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.a.TypeACurveGenerator;
 import java.security.SecureRandom;
 
 
-public class Sim1 {
+public class SPWSE_1 {
 
     private static Pairing bp;
 
     // 加密单词长度，为 2n
     private static int n;
     public static void setN(int n){
-        Sim1.n = n;
+        SPWSE_1.n = n;
     }
 
     // 主公钥
@@ -34,30 +34,30 @@ public class Sim1 {
     public static void setup(Pairing bp, int n, Field G1, Field G2, Field GT, Field Zr, Element g1, Element g2, // 公钥
                              Element v, Element[] S, Element[] T, // 私钥
                              Element r, Element[] R, Element m){ // 一些参与计算的随机数
-        Sim1.bp = bp;
-        Sim1.n = n;
+        SPWSE_1.bp = bp;
+        SPWSE_1.n = n;
         // 初始化生成元
-        Sim1.G1 = G1;
-        Sim1.G2 = G2;
-        Sim1.GT = GT;
-        Sim1.Zr = Zr;
-        Sim1.g1 = g1;
-        Sim1.g2 = g2;
+        SPWSE_1.G1 = G1;
+        SPWSE_1.G2 = G2;
+        SPWSE_1.GT = GT;
+        SPWSE_1.Zr = Zr;
+        SPWSE_1.g1 = g1;
+        SPWSE_1.g2 = g2;
 
-        Sim1.v = v;
-        Sim1.h = Sim1.g1.powZn(Sim1.v).getImmutable();
+        SPWSE_1.v = v;
+        SPWSE_1.h = SPWSE_1.g1.powZn(SPWSE_1.v).getImmutable();
 
-        Sim1.S = S;
-        Sim1.T = T;
+        SPWSE_1.S = S;
+        SPWSE_1.T = T;
 
         H = new Element[2*n];
         for(int i = 0; i < 2*n; i++){
             H[i] = g1.powZn(S[i]).mul(h.powZn(T[i])).getImmutable();
         }
 
-        Sim1.r = r;
-        Sim1.R = R;
-        Sim1.m = m;
+        SPWSE_1.r = r;
+        SPWSE_1.R = R;
+        SPWSE_1.m = m;
     }
 
 
