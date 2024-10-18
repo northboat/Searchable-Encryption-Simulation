@@ -1,3 +1,5 @@
+[SPWSE-1/2 算法仿真 | Northboat Dock](https://northboat.github.io/docs/sec/crypto/se/se-spwse.html)
+
 算法二的文档有一些错误
 
 - 加密时 `E[i]`的计算，底数为 g，而非 g1
@@ -11,4 +13,3 @@
   $$
   \prod_{i=1}^{2n}e(E[i]\cdot P[i],K[i])
   $$
-  
