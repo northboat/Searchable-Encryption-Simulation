@@ -43,8 +43,16 @@ public class SA_PAUKS {
     public static Element c1, c2, c3, c_1, c_2, c_3, c_4, c_5;
     public static void enc(String str){
         Element x1 = Zr.newRandomElement().getImmutable(), x2 = Zr.newRandomElement().getImmutable();
-        Element[] w = HashUtil.mapping(Zr, str, n);
-        c1 = HashUtil.H(pk_ss, pk_rs, w).powZn(sk_s).mul(g.powZn(x1.add(x2))).getImmutable();
+        Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
+//        for(Element e: w){
+//            System.out.println(e);
+//        }
+//        System.out.println();
+
+        c1 = HashUtil.hashZrArr2GWithTwoFact(pk_ss, pk_rs, w).powZn(sk_s).mul(g.powZn(x1.add(x2))).getImmutable();
+
+//        System.out.println(c1);
+
         c2 = pk_rs.powZn(x1).getImmutable();
         c3 = pk_cs.powZn(x2).getImmutable();
 
@@ -60,9 +68,17 @@ public class SA_PAUKS {
 
     public static Element t1, t2, t3, t_1, t_2, t_3, t_4, t_5;
     public static void trap(String str){
-        Element[] w = HashUtil.mapping(Zr, str, n);
+        Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
+//        for(Element e: w){
+//            System.out.println(e);
+//        }
+//        System.out.println();
+
         Element y1 = Zr.newRandomElement().getImmutable(), y2 = Zr.newRandomElement().getImmutable();
-        t1 = HashUtil.H(pk_ss, pk_rs, w).powZn(sk_r).mul(g.powZn(y1.add(y2))).getImmutable();
+        t1 = HashUtil.hashZrArr2GWithTwoFact(pk_ss, pk_rs, w).powZn(sk_r).mul(g.powZn(y1.add(y2))).getImmutable();
+
+//        System.out.println(t1);
+
         t2 = pk_ss.powZn(y1).getImmutable();
         t3 = pk_cs.powZn(y2).getImmutable();
 

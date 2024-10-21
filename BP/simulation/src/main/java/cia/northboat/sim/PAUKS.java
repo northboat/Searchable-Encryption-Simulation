@@ -35,29 +35,33 @@ public class PAUKS {
         PAUKS.sk_r3 = x3;
         PAUKS.sk_r4 = x4;
 
-        PAUKS.pk_r1 = g.powZn(x1);
-        PAUKS.pk_r2 = g.powZn(x2);
-        PAUKS.pk_r3 = g.powZn(x3);
+        PAUKS.pk_r1 = g.powZn(x1).getImmutable();
+        PAUKS.pk_r2 = g.powZn(x2).getImmutable();
+        PAUKS.pk_r3 = g.powZn(x3).getImmutable();
 
         PAUKS.sk_s = y;
-        PAUKS.pk_s = g.powZn(y);
+        PAUKS.pk_s = g.powZn(y).getImmutable();
     }
 
 
     public static Element C1, C2, C3, C4, C5;
     public static void enc(String str){
         Element r1 = Zr.newRandomElement().getImmutable(), r2 = Zr.newRandomElement().getImmutable();
-        Element[] w = HashUtil.mapping(Zr, str, n);
+        Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
 
 //        for(Element e: w){
 //            System.out.println(e);
 //        }
+//        System.out.println();
 
-        C1 = pk_r2.powZn(HashUtil.H1(Zr, pk_r1.powZn(sk_s), w)).mul(pk_r3).powZn(r1).getImmutable();
+        C1 = pk_r2.powZn(HashUtil.hashZrArr2Zr(Zr, pk_r1.powZn(sk_s), w)).mul(pk_r3).powZn(r1).getImmutable();
+
+//        System.out.println("wdnmd: " + HashUtil.hashZrArr2Zr(Zr, pk_r1.powZn(sk_s), w));
+
         C2 = g.powZn(r1).getImmutable();
-        C3 = pk_r2.powZn(HashUtil.H2(Zr, pk_r1.powZn(sk_s))).mul(pk_r3).powZn(r2).mul(g.powZn(HashUtil.H2(Zr, pk_r1.powZn(sk_s)).mul(r1)));
-        C4 = HashUtil.H4(g, w).powZn(r2).getImmutable();
-        C5 = HashUtil.H0(C1, C2, C3, C4).powZn(r1).getImmutable();
+        C3 = pk_r2.powZn(HashUtil.hashG2Zr(Zr, pk_r1.powZn(sk_s))).mul(pk_r3).powZn(r2).mul(g.powZn(HashUtil.hashG2Zr(Zr, pk_r1.powZn(sk_s)).mul(r1))).getImmutable();
+        C4 = HashUtil.hashZrArr2G(g, w).powZn(r2).getImmutable();
+        C5 = HashUtil.hash4G(C1, C2, C3, C4).powZn(r1).getImmutable();
 
 //        System.out.println(C1);
 //        System.out.println(C2);
@@ -68,12 +72,22 @@ public class PAUKS {
     public static Element T1, T2;
     public static void trap(String str){
         Element r3 = Zr.newRandomElement().getImmutable();
-        Element[] w = HashUtil.mapping(Zr, str, n);
-        T1 = g.powZn(r3.div(sk_r2.mul(HashUtil.H1(Zr, pk_s.powZn(sk_r1), w)).add(sk_r3))).getImmutable();
+        Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
+//        for(Element e: w){
+//            System.out.println(e);
+//        }
+        T1 = g.powZn(r3.div(sk_r2.mul(HashUtil.hashZrArr2Zr(Zr, pk_s.powZn(sk_r1), w)).add(sk_r3))).getImmutable();
+
+//        System.out.println("nmsl: " + HashUtil.hashZrArr2Zr(Zr, pk_s.powZn(sk_r1), w));
+
         T2 = g.powZn(r3).getImmutable();
     }
 
     public static boolean test(){
+        System.out.println("C1: " + C1);
+        System.out.println("C2: " + C2);
+        System.out.println("T1: " + T1);
+        System.out.println("T2: " + T2 + "\n");
         Element left = bp.pairing(C1, T1);
         Element right = bp.pairing(C2, T2);
         System.out.println("PAUKS verify test left: " + left);
@@ -84,8 +98,8 @@ public class PAUKS {
 
     private static Element uk_s1, uk_s2;
     public static void update(){
-        uk_s1 = HashUtil.H2(Zr, pk_s.powZn(sk_r1)).getImmutable();
-        uk_s2 = sk_r4.div(sk_r2.mul(HashUtil.H2(Zr, pk_s.powZn(sk_r1))).add(sk_r3)).getImmutable();
+        uk_s1 = HashUtil.hashG2Zr(Zr, pk_s.powZn(sk_r1)).getImmutable();
+        uk_s2 = sk_r4.div(sk_r2.mul(HashUtil.hashG2Zr(Zr, pk_s.powZn(sk_r1))).add(sk_r3)).getImmutable();
     }
 
     public static Element C6;
@@ -93,8 +107,7 @@ public class PAUKS {
     public static void updEnc(){
         C6 = C3.div(C2.powZn(uk_s1)).powZn(uk_s2).getImmutable();
 
-
-        Element left = bp.pairing(HashUtil.H0(C1, C2, C3, C4), C2);
+        Element left = bp.pairing(HashUtil.hash4G(C1, C2, C3, C4), C2);
         Element right = bp.pairing(C5, g);
 
         if(left.isEqual(right)){
@@ -111,10 +124,10 @@ public class PAUKS {
 
     public static Element T_1, T_2;
     public static void constTrap(String str){
-        Element[] w = HashUtil.mapping(Zr, str, n);
+        Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
         Element r = Zr.newRandomElement().getImmutable();
         T_1 = g.powZn(sk_r4.mul(r)).getImmutable();
-        T_2 = HashUtil.H4(g, w).powZn(r).getImmutable();
+        T_2 = HashUtil.hashZrArr2G(g, w).powZn(r).getImmutable();
 
 //        System.out.println(C6);
 //        System.out.println(T_2);
