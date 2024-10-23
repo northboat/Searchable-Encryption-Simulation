@@ -3,6 +3,8 @@ package cia.northboat.util;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 
+import java.math.BigInteger;
+
 public class HashUtil {
 
     // 字符串映射，通过 ASCII 码将每个字符映射到 Zr 群上
@@ -85,6 +87,15 @@ public class HashUtil {
 
     public static Element hashG2ZrWithZr(Field Zr, Element g, Element r){
         return hashG2Zr(Zr, g.powZn(r)).getImmutable();
+    }
+
+    // 将 GT 上元素 gt 映射为 log(q) 位的 Zr 上的整数元素
+    public static Element hashGT2ZrWithQ(Field Zr, Element gt, int q){
+        byte[] bytes = gt.toBytes();
+        BigInteger b = new BigInteger(1, bytes);
+        BigInteger qMask = BigInteger.ONE.shiftLeft((int)Math.log(q)).subtract(BigInteger.ONE); // log(q)位掩码
+        BigInteger truncatedHash = b.and(qMask);
+        return Zr.newElement(truncatedHash).getImmutable();
     }
 
 }

@@ -4,6 +4,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 public class BitUtil {
     public static Element xor(Field Zr, Element e1, Element e2){
@@ -16,10 +17,31 @@ public class BitUtil {
 
     public static Element connect(Field Zr, Element e1, Element e2, Element e3){
         BigInteger b1 = e1.toBigInteger(), b2 = e2.toBigInteger(), b3 = e3.toBigInteger();
-        BigInteger bShifted = b1.shiftLeft(b2.bitLength());
-        BigInteger bMerged = bShifted.or(b2);
-        BigInteger bMergedShifted = bMerged.shiftLeft(b3.bitLength());
-        BigInteger b = bMergedShifted.or(b3);
-        return Zr.newElement(b.mod(Zr.getOrder())).getImmutable();
+        BigInteger shift1 = b1.shiftLeft(b2.bitLength());
+        BigInteger or1 = shift1.or(b2);
+        BigInteger shift2 = or1.shiftLeft(b3.bitLength());
+        BigInteger or2 = shift2.or(b3);
+
+        return Zr.newElement(or2).getImmutable();
     }
+
+    public static Element split(Field Zr, Element msg, Element id, Element sk_id){
+        BigInteger m = msg.toBigInteger(), i = id.toBigInteger(), sk = sk_id.toBigInteger();
+        int ptLen = m.bitLength() - i.bitLength() - sk.bitLength();
+
+
+        BigInteger shift = m.shiftRight(sk.bitLength());
+        BigInteger mask = BigInteger.ONE.shiftLeft(ptLen).subtract(BigInteger.ONE);
+        BigInteger and = shift.and(mask);
+
+        return Zr.newElement(and).getImmutable();
+    }
+
+
+    public static Element random(Field Zr, int q){
+        SecureRandom random = new SecureRandom();
+        BigInteger randomBigInt = new BigInteger(q, random);
+        return Zr.newElement(randomBigInt).getImmutable();
+    }
+
 }

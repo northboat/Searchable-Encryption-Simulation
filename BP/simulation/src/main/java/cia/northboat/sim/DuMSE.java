@@ -7,13 +7,15 @@ import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.*;
 
 public class DuMSE {
     private static int n;
     private static Pairing bp;
     private static Field G1, G2, GT, Zr;
-    private static Element g1, g2, q;
+    private static Element g1, g2;
+    private static int q;
 
 
     private static Element sk_o, sk_i, sk_fs, sk_ss;
@@ -23,9 +25,9 @@ public class DuMSE {
 
     public static Map<String, Element> record;
 
-    public static void init(Pairing bp, Field G1, Field G2, Field GT, Field Zr, int n, Element g1,
-                            Element g2, Element q, Element x1, Element x2, Element x3, Element x4,
-                            Element id, Element sk_id, Element AI_o, Element A, Element B, Element C){
+    public static void init(Pairing bp, Field G1, Field G2, Field GT, Field Zr, int n,
+                            Element g1, Element g2, Element x1, Element x2, Element x3, Element x4,
+                            Element sk_id, Element AI_o){
         DuMSE.bp = bp;
         DuMSE.G1 = G1;
         DuMSE.G2 = G2;
@@ -34,7 +36,7 @@ public class DuMSE {
         DuMSE.n = n;
         DuMSE.g1 = g1;
         DuMSE.g2 = g2;
-        DuMSE.q = q;
+        DuMSE.q = 1024;
 
         DuMSE.sk_o = x1;
         DuMSE.pk_o = g2.powZn(sk_o.invert()).getImmutable();
@@ -53,15 +55,11 @@ public class DuMSE {
 
         // 在 enc 中用到的用户数据
         record = new HashMap<>();
-        DuMSE.id = id;
-        DuMSE.sk_id = sk_id;
+        id = Zr.newElement(123).getImmutable();
+        DuMSE.sk_id = Zr.newElement(new BigInteger("123456789"));
 
         // 在 trap 中用到的用户数据
         DuMSE.AI_o = AI_o;
-        T_i = new Element[3];
-        T_i[0] = A;
-        T_i[1] = B;
-        T_i[2] = C;
     }
 
 
@@ -70,36 +68,56 @@ public class DuMSE {
     public static Element C1, C2, C3;
     public static void enc(String str){
         Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
-        Element r = Zr.newRandomElement().getImmutable(), L = Zr.newRandomElement().getImmutable();
+        Element r = Zr.newRandomElement().getImmutable();
+
+        // log(q) 位的随机数
+        int bitLength = (int)Math.log(q);
+        SecureRandom random = new SecureRandom();
+        BigInteger randomBigInt = new BigInteger(bitLength, random);
+        Element L = Zr.newElement(randomBigInt).getImmutable();
+
+        // 不知道哪来的参数
         Element p = Zr.newRandomElement().getImmutable(), pr = Zr.newRandomElement().getImmutable();
 
         C2 = g1.powZn(r).getImmutable();
-        Element h = BitUtil.connect(Zr, id, L, sk_id);
 
-        // 这里涉及到位运算：异或和位连接
+        System.out.println("id: " + id);
+        System.out.println("L: " + L);
+        System.out.println("sk_id: " + sk_id);
+
+        // 连接，这里的连接如果超出了 Zr 群的上限，将会除余，可能会影响后续的分割，即还原不了
+        Element h = BitUtil.connect(Zr, id, L, sk_id);
+        System.out.println("Msg: " + h);
+
+        Element s = BitUtil.split(Zr, h, id, sk_id);
+        System.out.println("L': " + s);
+        System.out.println();
+
+        // 这里涉及到一个异或操作，我直接把他处理为 BigInteger 的 xor 操作，应该没问题
+        // 并且在哈希的时候限定了哈希值的长度，这个处理很有可能有问题
         if(!record.containsKey(str)){
             record.put(str, L);
             Element p1 = bp.pairing(HashUtil.hashZrArr2G(g1, w).powZn(p), pk_ss[1]).powZn(sk_o.invert()).getImmutable();
-            C1 = HashUtil.hashGT2G(Zr, p1).getImmutable();
+
+            C1 = HashUtil.hashGT2ZrWithQ(Zr, p1, q).getImmutable();
 
             Element p2 = bp.pairing(g1.powZn(pr), pk_ss[1]).powZn(sk_o.invert()).getImmutable();
-            Element p3 = HashUtil.hashGT2G(Zr, p2).getImmutable();
+            Element p3 = HashUtil.hashGT2ZrWithQ(Zr, p2, id.toBigInteger().bitLength() + q + sk_id.toBigInteger().bitLength());
+
             C3 = BitUtil.xor(Zr, p3, h);
 
         } else {
             C1 = record.get(str);
             Element p1 = bp.pairing(g1.powZn(pr), pk_ss[1]).powZn(sk_o.invert()).getImmutable();
-            Element p2 = HashUtil.hashGT2G(Zr, p1);
-            BigInteger i1 = p2.toBigInteger();
-            BigInteger i2 = h.toBigInteger();
-            BigInteger res = i1.xor(i2);
-            C3 = Zr.newElement(res.mod(Zr.getOrder())).getImmutable();
+            Element p2 = HashUtil.hashGT2ZrWithQ(Zr, p1, id.toBigInteger().bitLength() + q + sk_id.toBigInteger().bitLength());
+            C3 = BitUtil.xor(Zr, p2, h);
+            record.put(str, L);
         }
     }
 
     public static Element AI_o;
-    public static Element[] T_i;
     public static Element T1, T2, T3, T_1, T_2;
+    // 陷门计算应该没问题，不涉及一些敏感操作
     public static void trap(String str){
         Element[] w = HashUtil.hashStr2ZrArr(Zr, str, n);
         Element r1 = Zr.newRandomElement().getImmutable(), r2 = Zr.newRandomElement().getImmutable();
@@ -107,22 +125,27 @@ public class DuMSE {
         T2 = pk_fs.powZn(r2).getImmutable();
         T3 = HashUtil.hashZrArr2G(g1, w).powZn(sk_i).mul(g1.powZn(r1.add(r2))).getImmutable();
 
-        T_1 = T_i[0];
-        T_2 = bp.pairing(T_i[2].div(T_i[1].powZn(sk_fs.invert())), AI_o).getImmutable();
+        T_1 = T1.getImmutable();
+        T_2 = bp.pairing(T3.div(T2.powZn(sk_fs.invert())), AI_o).getImmutable();
     }
 
 
     public static boolean test(){
         Element p1 = bp.pairing(T_1, AI_o).getImmutable();
-        Element L = HashUtil.hashGT2G(Zr, T_2.powZn(sk_ss).div(p1)).getImmutable();
+        Element p2 = T_2.powZn(sk_ss).getImmutable();
+
+        // 又用到了这个哈希
+        Element L = HashUtil.hashGT2ZrWithQ(Zr, p2.div(p1), q).getImmutable();
 
         Element U1 = bp.pairing(C2, AI_o).powZn(sk_ss).getImmutable();
         Element U2 = C3;
-        Element p2 = HashUtil.hashGT2G(Zr, U1.powZn(sk_i)).getImmutable();
-        BigInteger i1 = p2.toBigInteger();
-        BigInteger i2 = U2.toBigInteger();
-        BigInteger res = i1.xor(i2);
-        Element Pt = Zr.newElement(res.mod(Zr.getOrder()));
+        Element p3 = HashUtil.hashGT2ZrWithQ(Zr, U1.powZn(sk_i), q).getImmutable();
+
+        // 异或
+        Element Msg = BitUtil.xor(Zr, p3, U2);
+
+        // 分割
+        Element Pt = BitUtil.split(Zr, Msg, id, sk_id);
 
         System.out.println(L);
         System.out.println(Pt);

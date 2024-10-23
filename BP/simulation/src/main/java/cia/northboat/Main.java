@@ -37,8 +37,6 @@ public class Main {
         y = Zr.newRandomElement().getImmutable();
 
         // DuMSE
-        id = Zr.newRandomElement().getImmutable();
-        sk_id = Zr.newRandomElement().getImmutable();
         AI_o = G1.newRandomElement().getImmutable();
         A = G1.newRandomElement().getImmutable();
         B = G1.newRandomElement().getImmutable();
@@ -70,7 +68,7 @@ public class Main {
     }
 
     public static void testDuMSE(String str){
-        DuMSE.init(bp, G1, G2, GT, Zr, n, g1, g2, y, x1, x2, x3, x4, id, sk_id, AI_o, A, B, C);
+        DuMSE.init(bp, G1, G2, GT, Zr, n, g1, g2, x1, x2, x3, x4, y, AI_o);
         DuMSE.enc(str);
         DuMSE.trap(str);
         System.out.println(DuMSE.test());
