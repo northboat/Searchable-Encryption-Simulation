@@ -14,4 +14,30 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!-- lombok-->
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+        </dependency>
+        <!--外部引用，打包时要包含进去-->
+        <dependency>
+            <groupId>jpbc.api</groupId>
+            <artifactId>api</artifactId>
+            <version>2.0.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/jpbc-api-2.0.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>jpbc-plaf</groupId>
+            <artifactId>plaf</artifactId>
+            <version>2.0.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/jpbc-plaf-2.0.0.jar</systemPath>
+        </dependency>
+    </dependencies>
+
 </project>

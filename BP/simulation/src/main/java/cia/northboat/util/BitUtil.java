@@ -5,6 +5,7 @@ import it.unisa.dia.gas.jpbc.Field;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.*;
 
 public class BitUtil {
     public static Element xor(Field Zr, Element e1, Element e2){
@@ -13,6 +14,13 @@ public class BitUtil {
         BigInteger res = i1.xor(i2);
 
         return Zr.newElement(res.mod(Zr.getOrder())).getImmutable();
+    }
+
+    public static byte[] connect(byte[] b1, byte[] b2){
+        BigInteger bi1 = new BigInteger(b1), bi2 = new BigInteger(b2);
+        BigInteger shifted = bi1.shiftLeft(bi2.bitLength());
+        BigInteger res =  shifted.or(bi2);
+        return res.toByteArray();
     }
 
     public static Element connect(Field Zr, Element e1, Element e2, Element e3){
@@ -42,6 +50,15 @@ public class BitUtil {
         SecureRandom random = new SecureRandom();
         BigInteger randomBigInt = new BigInteger(q, random);
         return Zr.newElement(randomBigInt).getImmutable();
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1,2,3,4};
+        int n = nums.length;
+        List<Integer> r = Arrays.asList(1,2,3,4);
+        System.out.println();
+        Map<Integer, Integer> map = new HashMap<>();
+        
     }
 
 }

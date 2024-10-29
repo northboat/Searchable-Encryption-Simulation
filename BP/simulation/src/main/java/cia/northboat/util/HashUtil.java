@@ -93,7 +93,7 @@ public class HashUtil {
     public static Element hashGT2ZrWithQ(Field Zr, Element gt, int q){
         byte[] bytes = gt.toBytes();
         BigInteger b = new BigInteger(1, bytes);
-        BigInteger qMask = BigInteger.ONE.shiftLeft((int)Math.log(q)).subtract(BigInteger.ONE); // log(q)位掩码
+        BigInteger qMask = BigInteger.ONE.shiftLeft(q).subtract(BigInteger.ONE); // log(q)位掩码
         BigInteger truncatedHash = b.and(qMask);
         return Zr.newElement(truncatedHash).getImmutable();
     }
