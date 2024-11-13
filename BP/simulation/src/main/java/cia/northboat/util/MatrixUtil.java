@@ -14,6 +14,7 @@ public class MatrixUtil {
         return b;
     }
 
+    // 求行列式
     public static BigInteger determinant(BigInteger[][] matrix) {
         int n = matrix.length;
         if (n == 1) {
@@ -65,8 +66,8 @@ public class MatrixUtil {
     public static BigInteger[][] inverse(Field Zr, BigInteger[][] matrix) {
         BigInteger det = determinant(matrix);
         det = det.mod(Zr.getOrder());
-        System.out.println(det);
-        System.out.println();
+//        System.out.println(det);
+//        System.out.println();
         if (det.equals(BigInteger.ZERO)) {
             throw new ArithmeticException("Matrix is not invertible.");
         }
@@ -74,7 +75,7 @@ public class MatrixUtil {
         BigInteger[][] inv = new BigInteger[matrix.length][matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) {
-                inv[i][j] = adj[i][j].divide(det);
+                inv[i][j] = adj[i][j].divide(det).mod(Zr.getOrder());
 //                System.out.println(adj[i][j].divide(det));
             }
         }
@@ -92,5 +93,48 @@ public class MatrixUtil {
             res[i] = row;
         }
         return res;
+    }
+
+    public static void main(String[] args) {
+
+//
+//        // 解方程
+//        BigInteger[][] matrix = new BigInteger[W.size()][3];
+//        for(int i = 0; i < W.size(); i++){
+//            for(int j = 0; j < 3; j++){
+//                matrix[i][j] = HW[i].powZn(Zr.newElement(3-j)).toBigInteger().mod(Zr.getOrder());
+//            }
+//        }
+//
+//        for(BigInteger[] row: matrix){
+//            for(BigInteger i: row){
+//                System.out.print(i + "   ");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+//
+//        // 求逆
+//        matrix = MatrixUtil.inverse(Zr, matrix);
+//        for(BigInteger[] row: matrix){
+//            for(BigInteger i: row){
+//                System.out.print(i + "   ");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+//
+//        BigInteger[][] test = MatrixUtil.inverse(Zr, matrix);
+//        for(BigInteger[] row: test){
+//            for(BigInteger i: row){
+//                System.out.print(i + "   ");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+
+        // x^3-6x^2+11x-5 = 1
+        // 求解，从 3 到 1
+//        BigInteger[] vec = MatrixUtil.mul(matrix, MatrixUtil.getOneVector(3));
     }
 }

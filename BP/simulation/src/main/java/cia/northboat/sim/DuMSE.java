@@ -129,7 +129,7 @@ public class DuMSE {
         Element p2 = T_2.powZn(sk_ss).getImmutable();
 
         // 又用到了这个哈希
-        Element L = HashUtil.hashGT2ZrWithQ(Zr, p2.div(p1), (int)Math.log(q)).getImmutable();
+        Element L1 = HashUtil.hashGT2ZrWithQ(Zr, p2.div(p1), (int)Math.log(q)).getImmutable();
 
         Element U1 = bp.pairing(C2, AI_o).powZn(sk_ss).getImmutable();
         Element U2 = C3;
@@ -141,9 +141,9 @@ public class DuMSE {
         // 分割
         Element Pt = BitUtil.split(Zr, Msg, id, sk_id);
 
-        System.out.println("L': " + L);
-        System.out.println("Pt: " + Pt);
-        return L.isEqual(Pt);
+        System.out.println("L': " + L1);
+//        System.out.println("Pt: " + Pt);
+        return false;
     }
 
 }

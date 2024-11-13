@@ -34,9 +34,10 @@ public class HashUtil {
     public static Element hashZrArr2Zr(Field Zr, Element g, Element[] w){
         Element h = g.duplicate();
         for(Element e: w){
-            h.powZn(e);
+            if(!e.isZero()){
+                h.powZn(e);
+            }
         }
-//        System.out.println(h);
         return HashUtil.hashG2Zr(Zr, h);
     }
 
@@ -55,7 +56,9 @@ public class HashUtil {
     public static Element hashZrArr2G(Element g, Element[] w){
         Element h = g.duplicate();
         for(Element e: w){
-            h.powZn(e);
+            if(!e.isZero()){
+                h.powZn(e);
+            }
         }
         return h.getImmutable();
     }
@@ -63,9 +66,10 @@ public class HashUtil {
     public static Element hashZrArr2GWithTwoFact(Element pk1, Element pk2, Element[] w){
         Element h = pk1.mul(pk2).duplicate();
         for(Element e: w){
-            h.powZn(e);
+            if(!e.isZero()){
+                h.powZn(e);
+            }
         }
-        System.out.println(h);
         return h;
     }
 
@@ -74,7 +78,9 @@ public class HashUtil {
     public static Element hashGT2GWithZrArr(Field G, Element gt, Element[] w){
         Element h = gt.duplicate();
         for(Element e: w){
-            h.powZn(e);
+            if(!e.isZero()){
+                h.powZn(e);
+            }
         }
         byte[] bytes = h.toBytes();
         return G.newElementFromHash(bytes, 0, bytes.length).getImmutable();
@@ -96,6 +102,12 @@ public class HashUtil {
         BigInteger qMask = BigInteger.ONE.shiftLeft(q).subtract(BigInteger.ONE); // log(q)位掩码
         BigInteger truncatedHash = b.and(qMask);
         return Zr.newElement(truncatedHash).getImmutable();
+    }
+
+    public static Element getInvModP(Field Zr, Element e, Element p){
+//        System.out.println(e);
+//        System.out.println(p);
+        return Zr.newElement(e.toBigInteger().modInverse(p.toBigInteger())).getImmutable();
     }
 
 }

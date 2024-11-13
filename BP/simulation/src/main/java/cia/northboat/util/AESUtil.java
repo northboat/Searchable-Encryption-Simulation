@@ -18,11 +18,9 @@ public class AESUtil {
         // 生成密钥
         SecretKey secretKey = keyGenerator.generateKey();
         // 获取密钥内容
-        byte[] key = secretKey.getEncoded();
+        return secretKey.getEncoded();
 
-        System.out.println(Base64.getEncoder().encodeToString(key));
-
-        return key;
+//        System.out.println(Base64.getEncoder().encodeToString(key));
     }
 
     public static byte[] enc(byte[] data, byte[] key) throws Exception {
